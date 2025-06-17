@@ -35,12 +35,12 @@ function App() {
   };
 
   const renderNavigation = () => (
-    <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
+    <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10 overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <BookOpen className="h-8 w-8 text-blue-600 mr-3" />
-            <h1 className="text-xl font-bold text-gray-900">GATE Practice Hub</h1>
+            <h1 className="text-xl font-bold text-gray-900">Practice</h1>
           </div>
           <div className="flex items-center space-x-4">
             <button
@@ -85,7 +85,7 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {renderNavigation()}
       
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {currentView === 'setup' && (
           <SubjectSelector onStartSession={handleStartSession} />
         )}

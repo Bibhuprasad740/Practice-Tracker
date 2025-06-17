@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, BookOpen, Clock, Trash2 } from 'lucide-react';
 import { PracticeSession } from '../types';
-import { getStoredSessions } from '../utils/storage';
+import { getStoredSessions, saveSession } from '../utils/storage';
 import ResponseViewer from './ResponseViewer';
 
 const HistoryViewer: React.FC = () => {
@@ -51,8 +51,17 @@ const HistoryViewer: React.FC = () => {
     }
   }
 
+  const handleUpdateSession = (updatedSession: PracticeSession) => {
+    // Save to localStorage
+    saveSession(updatedSession);
+    // Update state if needed
+    setSessions(prev => prev.map(s =>
+      s.id === updatedSession.id ? updatedSession : s
+    ));
+  };
+
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-7xl mx-auto">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Practice History</h2>
         <p className="text-gray-600">Review your past practice sessions and track your progress</p>
@@ -61,7 +70,7 @@ const HistoryViewer: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sessions List */}
         <div className="lg:col-span-1">
-          <div className="space-y-4">
+          <div className="space-y-4 h-96 overflow-y-scroll">
             {sessions.map((session) => (
               <div
                 key={session.id}
@@ -123,30 +132,30 @@ const HistoryViewer: React.FC = () => {
 
         {/* Session Details */}
         <div className="lg:col-span-2">
-          {selectedSession && <ResponseViewer session={selectedSession} onBack={() => setSelectedSession(null)} />} 
+          {selectedSession && <ResponseViewer session={selectedSession} onBack={() => setSelectedSession(null)} onUpdateSession={handleUpdateSession} />}
         </div>
 
         <div className="lg:col-span-1">
           {selectedSession ? (
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Session Details</h3>
-              
+
               <div className="space-y-4">
                 <div>
                   <span className="text-sm font-medium text-gray-600">Subject:</span>
                   <p className="text-gray-900">{selectedSession.subject}</p>
                 </div>
-                
+
                 <div>
                   <span className="text-sm font-medium text-gray-600">Question Range:</span>
                   <p className="text-gray-900">{selectedSession.startQuestion} - {selectedSession.endQuestion}</p>
                 </div>
-                
+
                 <div>
                   <span className="text-sm font-medium text-gray-600">Start Time:</span>
                   <p className="text-gray-900">{new Date(selectedSession.startTime).toLocaleString()}</p>
                 </div>
-                
+
                 {selectedSession.endTime && (
                   <div>
                     <span className="text-sm font-medium text-gray-600">End Time:</span>

@@ -24,3 +24,12 @@ export interface Subject {
   totalSessions: number;
   lastPracticed?: Date;
 }
+
+export interface VerifiedQuestion extends Question {
+  isCorrect?: boolean;
+  verified?: boolean;
+}
+
+export interface VerifiedPracticeSession extends PracticeSession {
+  questions: VerifiedQuestion[];
+}
