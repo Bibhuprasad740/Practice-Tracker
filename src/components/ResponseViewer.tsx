@@ -8,7 +8,9 @@ interface ResponseViewerProps {
 }
 
 const ResponseViewer: React.FC<ResponseViewerProps> = ({ session, onBack }) => {
+  console.log('The session: ' + session);
   const formatAnswer = (question: any) => {
+    console.log(question);
     if (question.skipped) return 'Skipped';
     if (question.answer === undefined) return 'Not answered';
     
@@ -120,11 +122,11 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ session, onBack }) => {
       </div>
 
       {/* Responses Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {session.questions.map((question) => (
-          <div key={question.id} className="bg-white rounded-lg shadow-md p-6">
+          <div key={question.id} className="bg-white rounded-lg shadow-md p-3">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-lg font-semibold text-gray-900">Q{question.id}</h4>
+              <h4 className="text-sm font-semibold text-gray-900 mr-2">Q{question.id}</h4>
               <div className="flex items-center space-x-2">
                 <span className={`px-2 py-1 text-xs font-medium rounded ${
                   question.type === 'MCQ' ? 'bg-blue-100 text-blue-800' :

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, BookOpen, Clock, Trash2 } from 'lucide-react';
 import { PracticeSession } from '../types';
 import { getStoredSessions } from '../utils/storage';
+import ResponseViewer from './ResponseViewer';
 
 const HistoryViewer: React.FC = () => {
   const [sessions, setSessions] = useState<PracticeSession[]>([]);
@@ -9,6 +10,7 @@ const HistoryViewer: React.FC = () => {
 
   useEffect(() => {
     setSessions(getStoredSessions().sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()));
+    // console.log('sessions from history viewer: ' + sessions);
   }, []);
 
   const formatDuration = (start: Date, end?: Date) => {
@@ -43,6 +45,12 @@ const HistoryViewer: React.FC = () => {
     );
   }
 
+  if (sessions.length !== 0) {
+    for (let i = 0; i < sessions.length; i++) {
+      console.log(sessions[i]);
+    }
+  }
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="mb-8">
@@ -50,16 +58,15 @@ const HistoryViewer: React.FC = () => {
         <p className="text-gray-600">Review your past practice sessions and track your progress</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sessions List */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-1">
           <div className="space-y-4">
             {sessions.map((session) => (
               <div
                 key={session.id}
-                className={`bg-white rounded-lg shadow-md p-6 cursor-pointer transition-all hover:shadow-lg ${
-                  selectedSession?.id === session.id ? 'ring-2 ring-blue-500' : ''
-                }`}
+                className={`bg-white rounded-lg shadow-md p-6 cursor-pointer transition-all hover:shadow-lg ${selectedSession?.id === session.id ? 'ring-2 ring-blue-500' : ''
+                  }`}
                 onClick={() => setSelectedSession(session)}
               >
                 <div className="flex items-center justify-between mb-4">
@@ -74,7 +81,7 @@ const HistoryViewer: React.FC = () => {
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div className="flex items-center text-sm text-gray-600">
                     <Calendar className="h-4 w-4 mr-2" />
@@ -91,9 +98,8 @@ const HistoryViewer: React.FC = () => {
                     Questions {session.startQuestion} - {session.endQuestion}
                   </span>
                   <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-1 text-xs font-medium rounded ${
-                      session.completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                    }`}>
+                    <span className={`px-2 py-1 text-xs font-medium rounded ${session.completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}>
                       {session.completed ? 'Completed' : 'In Progress'}
                     </span>
                     <span className="text-sm font-semibold text-blue-600">
@@ -104,7 +110,7 @@ const HistoryViewer: React.FC = () => {
 
                 <div className="mt-3">
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all"
                       style={{ width: `${getCompletionRate(session)}%` }}
                     ></div>
@@ -116,6 +122,10 @@ const HistoryViewer: React.FC = () => {
         </div>
 
         {/* Session Details */}
+        <div className="lg:col-span-2">
+          {selectedSession && <ResponseViewer session={selectedSession} onBack={() => setSelectedSession(null)} />} 
+        </div>
+
         <div className="lg:col-span-1">
           {selectedSession ? (
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">

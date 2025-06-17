@@ -269,7 +269,7 @@ const QuestionSolver: React.FC<QuestionSolverProps> = ({ session, onFinish, onBa
           <div className="text-sm text-gray-600">
             {currentQuestion.skipped && <span className="text-red-600">Question skipped</span>}
             {currentQuestion.answer !== undefined && !currentQuestion.skipped && (
-              <span className="text-green-600">Answer saved</span>
+              <span className="text-green-600">Answer saved {currentQuestion.answer}</span>
             )}
           </div>
         </div>
