@@ -79,11 +79,11 @@ const HistoryViewer: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sessions List */}
         <div className="lg:col-span-1">
-          <div className="space-y-4 h-96 overflow-y-scroll">
+          <div className="space-y-4 max-h-96 overflow-y-scroll">
             {sessions.map((session) => (
               <div
                 key={session.id}
-                className={`bg-white rounded-lg shadow-md p-6 cursor-pointer transition-all hover:shadow-lg ${selectedSession?.id === session.id ? 'ring-2 ring-blue-500' : ''
+                className={`bg-white rounded-lg shadow-md m-2 p-6 cursor-pointer transition-all hover:shadow-lg ${selectedSession?.id === session.id ? 'shadow-lg ring ring-gray-300' : ''
                   }`}
                 onClick={() => setSelectedSession(session)}
               >
@@ -183,7 +183,7 @@ const HistoryViewer: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-2xl font-bold text-red-600">
-                        {selectedSession.questions.filter(q => q.skipped).length}
+                        {selectedSession.questions.filter(q => q.skipped || q.answer === undefined).length}
                       </p>
                       <p className="text-xs text-gray-600">Skipped</p>
                     </div>

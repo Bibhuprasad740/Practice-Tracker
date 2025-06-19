@@ -24,7 +24,8 @@ function App() {
     setCurrentView('solving');
   };
 
-  const handleFinishSolving = () => {
+  const handleFinishSolving = (session: PracticeSession) => {
+    setCurrentSession(session);
     setCurrentView('review');
   };
 

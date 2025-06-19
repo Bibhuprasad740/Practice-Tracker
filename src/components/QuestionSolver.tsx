@@ -5,7 +5,7 @@ import { saveSession } from '../utils/storage';
 
 interface QuestionSolverProps {
   session: PracticeSession;
-  onFinish: () => void;
+  onFinish: (session: PracticeSession) => void;
   onBack: () => void;
 }
 
@@ -84,7 +84,7 @@ const QuestionSolver: React.FC<QuestionSolverProps> = ({ session, onFinish, onBa
     };
     setSessionData(updatedSession);
     saveSession(updatedSession);
-    onFinish();
+    onFinish(updatedSession);
   };
 
   const getAnsweredCount = () => {

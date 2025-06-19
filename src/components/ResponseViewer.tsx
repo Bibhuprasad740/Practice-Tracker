@@ -192,14 +192,26 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ session, onBack, onUpda
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {localSession.questions.map((question) => {
           const status = getQuestionStatus(question);
-          const isIncorrect = status === 'incorrect' || status === 'unanswered';
-          const isCorrect = status === 'correct';
+          const isIncorrect = status === 'incorrect';
+
+          const getColorOfGridItem = (status: string) => {
+            if(status === 'correct') {
+              return 'bg-green-100';
+            }
+            if(status === 'incorrect') {
+              return 'bg-red-100';
+            }
+            if(status === 'skipped' || status === 'unanswered') {
+              return 'bg-white';
+            }
+
+            return 'bg-white';
+          }
 
           return (
             <div
               key={question.id}
-              className={`rounded-lg shadow-md p-3 transition-all ${isIncorrect ? 'bg-red-100' : isCorrect ? 'bg-green-100  ' : 'bg-white'
-                }`}
+              className={`rounded-lg shadow-md p-3 transition-all ${getColorOfGridItem(status)}`}
             >
               <div className="flex items-center justify-between mb-3">
                 {/* Question Number */}
