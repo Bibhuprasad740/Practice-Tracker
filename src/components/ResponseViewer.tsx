@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Download, Check, X, Hash } from 'lucide-react';
 import { PracticeSession, VerifiedPracticeSession, VerifiedQuestion } from '../types';
 
@@ -9,22 +9,29 @@ interface ResponseViewerProps {
 }
 
 const ResponseViewer: React.FC<ResponseViewerProps> = ({ session, onBack, onUpdateSession }) => {
+  const [localSession, setLocalSession] = useState<VerifiedPracticeSession>(session as VerifiedPracticeSession);
+
+  useEffect(() => {
+    setLocalSession(session as VerifiedPracticeSession);
+  }, [session]);
+
   // Cast the session to our verified type for type safety
   const verifiedSession = session as VerifiedPracticeSession;
 
   const updateQuestionStatus = (questionId: number, isCorrect: boolean) => {
-    const updatedQuestions = verifiedSession.questions.map(q => ({
+    const updatedQuestions = localSession.questions.map(q => ({
       ...q,
       isCorrect: q.id === questionId ? isCorrect : q.isCorrect,
       verified: q.id === questionId ? true : q.verified
     }));
 
-    const updatedSession: PracticeSession = {
-      ...verifiedSession,
+    const updatedSession: VerifiedPracticeSession = {
+      ...localSession,
       questions: updatedQuestions
     };
 
-    onUpdateSession(updatedSession);
+    setLocalSession(updatedSession); // <- Instantly update UI
+    onUpdateSession(updatedSession); // <- Inform parent
   };
 
   const formatAnswer = (question: VerifiedQuestion) => {
@@ -123,17 +130,17 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ session, onBack, onUpda
   };
 
   // Calculate counts including verified status
-  const answeredCount = verifiedSession.questions.filter(q =>
+  const answeredCount = localSession.questions.filter(q =>
     q.answer !== undefined && !q.skipped
   ).length;
-  const correctCount = verifiedSession.questions.filter(q =>
+  const correctCount = localSession.questions.filter(q =>
     q.verified && q.isCorrect
   ).length;
-  const incorrectCount = verifiedSession.questions.filter(q =>
+  const incorrectCount = localSession.questions.filter(q =>
     q.verified && !q.isCorrect
   ).length;
-  const skippedCount = verifiedSession.questions.filter(q => q.skipped).length;
-  const totalQuestions = verifiedSession.questions.length;
+  const skippedCount = localSession.questions.filter(q => q.skipped).length;
+  const totalQuestions = localSession.questions.length;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -157,7 +164,7 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ session, onBack, onUpda
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-blue-50 p-4 rounded-lg">
             <h3 className="text-lg font-semibold text-blue-900">Subject</h3>
-            <p className="text-blue-700">{verifiedSession.subject}</p>
+            <p className="text-blue-700">{localSession.subject}</p>
           </div>
           <div className="bg-green-50 p-4 rounded-lg">
             <h3 className="text-lg font-semibold text-green-900">Correct</h3>
@@ -169,48 +176,48 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ session, onBack, onUpda
           </div>
           <div className="bg-purple-50 p-4 rounded-lg">
             <h3 className="text-lg font-semibold text-purple-900">Range</h3>
-            <p className="text-purple-700">{verifiedSession.startQuestion} - {verifiedSession.endQuestion}</p>
+            <p className="text-purple-700">{localSession.startQuestion} - {localSession.endQuestion}</p>
           </div>
         </div>
       </div>
 
       {/* Responses Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {verifiedSession.questions.map((question) => {
+        {localSession.questions.map((question) => {
           const status = getQuestionStatus(question);
           const isIncorrect = status === 'incorrect' || status === 'unanswered';
           const isCorrect = status === 'correct';
-          
+
           return (
-            <div 
-              key={question.id} 
-              className={`rounded-lg shadow-md p-3 transition-all ${
-                isIncorrect ? 'bg-red-100' : isCorrect ? 'bg-green-100  ' : 'bg-white'
-              }`}
+            <div
+              key={question.id}
+              className={`rounded-lg shadow-md p-3 transition-all ${isIncorrect ? 'bg-red-100' : isCorrect ? 'bg-green-100  ' : 'bg-white'
+                }`}
             >
               <div className="flex items-center justify-between mb-3">
+                {/* Question Number */}
                 <h4 className="text-sm font-semibold text-gray-900 mr-2">Q{question.id}</h4>
+
+                {/* Question Type */}
                 <div className="flex items-center space-x-2">
-                  <span className={`px-2 py-1 text-xs font-medium rounded ${
-                    question.type === 'MCQ' ? 'bg-blue-100 text-blue-800' :
-                    question.type === 'MSQ' ? 'bg-purple-100 text-purple-800' :
-                    'bg-orange-100 text-orange-800'
-                  }`}>
+                  <span className={`px-2 py-1 text-xs font-medium rounded ${question.type === 'MCQ' ? 'bg-blue-100 text-blue-800' :
+                      question.type === 'MSQ' ? 'bg-purple-100 text-purple-800' :
+                        'bg-orange-100 text-orange-800'
+                    }`}>
                     {question.type}
                   </span>
                   {getQuestionActions(question)}
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <div>
-                  <p className={`text-sm ${
-                    question.skipped ? 'text-red-600' :
-                    question.answer !== undefined ? 
-                      isIncorrect ? 'text-red-600' : 
-                      status === 'correct' ? 'text-green-600' : 'text-gray-500'
-                    : 'text-gray-500'
-                  }`}>
+                  <p className={`text-sm ${question.skipped ? 'text-red-600' :
+                      question.answer !== undefined ?
+                        isIncorrect ? 'text-red-600' :
+                          status === 'correct' ? 'text-green-600' : 'text-gray-500'
+                        : 'text-gray-500'
+                    }`}>
                     {formatAnswer(question)}
                   </p>
                 </div>
@@ -226,19 +233,19 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ session, onBack, onUpda
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           <div>
             <p className="text-2xl font-bold text-blue-600">
-              {verifiedSession.questions.filter(q => q.type === 'MCQ').length}
+              {localSession.questions.filter(q => q.type === 'MCQ').length}
             </p>
             <p className="text-sm text-gray-600">MCQ Questions</p>
           </div>
           <div>
             <p className="text-2xl font-bold text-purple-600">
-              {verifiedSession.questions.filter(q => q.type === 'MSQ').length}
+              {localSession.questions.filter(q => q.type === 'MSQ').length}
             </p>
             <p className="text-sm text-gray-600">MSQ Questions</p>
           </div>
           <div>
             <p className="text-2xl font-bold text-orange-600">
-              {verifiedSession.questions.filter(q => q.type === 'NAT').length}
+              {localSession.questions.filter(q => q.type === 'NAT').length}
             </p>
             <p className="text-sm text-gray-600">NAT Questions</p>
           </div>
