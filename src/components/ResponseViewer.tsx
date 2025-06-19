@@ -142,6 +142,13 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ session, onBack, onUpda
   const skippedCount = localSession.questions.filter(q => q.skipped).length;
   const totalQuestions = localSession.questions.length;
 
+  // score
+  const score = correctCount * 1 - incorrectCount * 0.33;
+  const percentage = totalQuestions > 0 ? (score / totalQuestions) * 100 : 0;
+  const accuracy = correctCount + incorrectCount > 0
+    ? (correctCount / (correctCount + incorrectCount)) * 100
+    : 0;
+
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header - Updated to show correct/incorrect counts */}
@@ -162,10 +169,6 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ session, onBack, onUpda
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold text-blue-900">Subject</h3>
-            <p className="text-blue-700">{localSession.subject}</p>
-          </div>
           <div className="bg-green-50 p-4 rounded-lg">
             <h3 className="text-lg font-semibold text-green-900">Correct</h3>
             <p className="text-2xl font-bold text-green-700">{correctCount}/{totalQuestions}</p>
@@ -177,6 +180,10 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ session, onBack, onUpda
           <div className="bg-purple-50 p-4 rounded-lg">
             <h3 className="text-lg font-semibold text-purple-900">Range</h3>
             <p className="text-purple-700">{localSession.startQuestion} - {localSession.endQuestion}</p>
+          </div>
+          <div className="bg-yellow-50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold text-yellow-900">Score</h3>
+            <p className="text-2xl font-bold text-yellow-700">{score.toFixed(2)} / {totalQuestions}</p>
           </div>
         </div>
       </div>
@@ -201,8 +208,8 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ session, onBack, onUpda
                 {/* Question Type */}
                 <div className="flex items-center space-x-2">
                   <span className={`px-2 py-1 text-xs font-medium rounded ${question.type === 'MCQ' ? 'bg-blue-100 text-blue-800' :
-                      question.type === 'MSQ' ? 'bg-purple-100 text-purple-800' :
-                        'bg-orange-100 text-orange-800'
+                    question.type === 'MSQ' ? 'bg-purple-100 text-purple-800' :
+                      'bg-orange-100 text-orange-800'
                     }`}>
                     {question.type}
                   </span>
@@ -213,10 +220,10 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ session, onBack, onUpda
               <div className="space-y-2">
                 <div>
                   <p className={`text-sm ${question.skipped ? 'text-red-600' :
-                      question.answer !== undefined ?
-                        isIncorrect ? 'text-red-600' :
-                          status === 'correct' ? 'text-green-600' : 'text-gray-500'
-                        : 'text-gray-500'
+                    question.answer !== undefined ?
+                      isIncorrect ? 'text-red-600' :
+                        status === 'correct' ? 'text-green-600' : 'text-gray-500'
+                      : 'text-gray-500'
                     }`}>
                     {formatAnswer(question)}
                   </p>
@@ -251,10 +258,25 @@ const ResponseViewer: React.FC<ResponseViewerProps> = ({ session, onBack, onUpda
           </div>
           <div>
             <p className="text-2xl font-bold text-green-600">
-              {correctCount > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0}%
+              {percentage.toFixed(2)}%
             </p>
-            <p className="text-sm text-gray-600">Accuracy Rate</p>
+            <p className="text-sm text-gray-600">Percentage</p>
           </div>
+
+          <div>
+            <p className="text-2xl font-bold text-blue-700">
+              {score.toFixed(2)}
+            </p>
+            <p className="text-sm text-gray-600">Score</p>
+          </div>
+
+          <div>
+            <p className="text-2xl font-bold text-green-700">
+              {accuracy.toFixed(2)}%
+            </p>
+            <p className="text-sm text-gray-600">Accuracy</p>
+          </div>
+
         </div>
       </div>
     </div>

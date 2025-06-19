@@ -10,7 +10,6 @@ const HistoryViewer: React.FC = () => {
 
   useEffect(() => {
     setSessions(getStoredSessions().sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()));
-    // console.log('sessions from history viewer: ' + sessions);
   }, []);
 
   const formatDuration = (start: Date, end?: Date) => {
@@ -45,12 +44,6 @@ const HistoryViewer: React.FC = () => {
     );
   }
 
-  if (sessions.length !== 0) {
-    for (let i = 0; i < sessions.length; i++) {
-      console.log(sessions[i]);
-    }
-  }
-
   const handleUpdateSession = (updatedSession: PracticeSession) => {
     // Save to localStorage
     saveSession(updatedSession);
@@ -60,12 +53,28 @@ const HistoryViewer: React.FC = () => {
     ));
   };
 
+  const getTimeTaken = (session: PracticeSession) => {
+    if (!session.endTime) return null;
+    const durationMs = new Date(session.endTime).getTime() - new Date(session.startTime).getTime();
+    const minutes = Math.floor(durationMs / 60000);
+    const seconds = Math.floor((durationMs % 60000) / 1000);
+    return `${minutes}m ${seconds}s`;
+  };
+
+  const getAvgTimePerQuestion = (session: PracticeSession) => {
+    if (!session.endTime) return null;
+    const durationMs = new Date(session.endTime).getTime() - new Date(session.startTime).getTime();
+    const answeredCount = session.questions.filter(q => q.answer !== undefined || q.skipped).length;
+    if (answeredCount === 0) return null;
+    const avgSeconds = Math.floor(durationMs / answeredCount / 1000);
+    const min = Math.floor(avgSeconds / 60);
+    const sec = avgSeconds % 60;
+    return `${min}m ${sec}s`;
+  };
+
+
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Practice History</h2>
-        <p className="text-gray-600">Review your past practice sessions and track your progress</p>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sessions List */}
@@ -178,7 +187,26 @@ const HistoryViewer: React.FC = () => {
                       </p>
                       <p className="text-xs text-gray-600">Skipped</p>
                     </div>
+
                   </div>
+                  {selectedSession.endTime && (
+                    <>
+                      <div className="grid grid-cols-2 gap-4 text-center mt-4">
+                        <div>
+                          <p className="text-xl font-semibold text-blue-600">
+                            {getTimeTaken(selectedSession)}
+                          </p>
+                          <p className="text-xs text-gray-600">Total Time</p>
+                        </div>
+                        <div>
+                          <p className="text-xl font-semibold text-indigo-600">
+                            {getAvgTimePerQuestion(selectedSession)}
+                          </p>
+                          <p className="text-xs text-gray-600">Avg Time / Question</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div className="pt-4 border-t">
